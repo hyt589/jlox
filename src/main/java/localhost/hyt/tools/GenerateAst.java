@@ -1,6 +1,9 @@
 package localhost.hyt.tools;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.List;
 
 public class GenerateAst {
     public static void main(String[] args) throws IOException
@@ -11,5 +14,57 @@ public class GenerateAst {
             System.exit(64);
         }
         String outputDir = args[0];
+        defineAst(outputDir, "Expr", Arrays.asList(
+            "Binary   : Expr left, Token operator, Expr right",
+            "Grouping : Expr expression",
+            "Literal  : Object value",
+            "Unary    : Token operator, Expr right"
+        ));
+    }
+
+    private static void defineAst(String outputDir, String baseName, List<String> rules) throws IOException
+    {
+        String path = outputDir + "/" + baseName + ".java";
+        PrintWriter writer = new PrintWriter(path, "UTF-8");
+        writer.println("package localhost.hyt.lox;");
+        writer.println();
+        writer.println("import java.util.List;");
+        writer.println();
+        writer.println("abstract class " + baseName);
+        writer.println("{");
+
+        for (String rule : rules)
+        {
+            String className = rule.split(":")[0].trim();
+            String fieldList = rule.split(":")[1].trim();
+            defineType(writer, baseName, className, fieldList);
+        }
+
+        writer.println("}");
+        writer.close();
+    }
+
+    private static void defineType(PrintWriter writer, String baseName, String className, String fieldList)
+    {
+        writer.println("    static class " + className + " extends " + baseName);
+        writer.println("    {");
+
+        writer.println("        " + className + "(" + fieldList + ")");
+        writer.println("        {");
+        String[] fields = fieldList.split(", ");
+        for (String field : fields)
+        {
+            String name = field.split(" ")[1];
+            writer.println("            this." + name + " = " + name + ";");
+        }
+        writer.println("        }");
+
+        writer.println();
+        for (String field : fields)
+        {
+            writer.println("        final " + field + ";");
+        }
+
+        writer.println("    }");
     }
 }
