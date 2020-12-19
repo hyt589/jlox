@@ -1,11 +1,15 @@
 package localhost.hyt.lox;
 
+import java.util.List;
+
 import localhost.hyt.lox.Expr.Binary;
 import localhost.hyt.lox.Expr.Grouping;
 import localhost.hyt.lox.Expr.Literal;
 import localhost.hyt.lox.Expr.Unary;
+import localhost.hyt.lox.Stmt.Expression;
+import localhost.hyt.lox.Stmt.Print;
 
-class Interpreter implements Expr.Visitor<Object> {
+class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     void interpret(Expr expr) {
         try {
@@ -14,6 +18,22 @@ class Interpreter implements Expr.Visitor<Object> {
         } catch (RuntimeError error) {
             Lox.runtimeError(error);
         }
+    }
+
+    void interpret(List<Stmt> statements)
+    {
+        try {
+            for (Stmt statement : statements)
+            {
+                execute(statement);
+            }
+        } catch (RuntimeError e) {
+            Lox.runtimeError(e);
+        }
+    }
+
+    private void execute(Stmt statement) {
+        statement.accept(this);
     }
 
     @Override
@@ -143,5 +163,18 @@ class Interpreter implements Expr.Visitor<Object> {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public Void visitExpressionStmt(Expression stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
     }
 }

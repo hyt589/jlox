@@ -4,12 +4,17 @@ import localhost.hyt.lox.Expr.Binary;
 import localhost.hyt.lox.Expr.Grouping;
 import localhost.hyt.lox.Expr.Literal;
 import localhost.hyt.lox.Expr.Unary;
+import localhost.hyt.lox.Stmt.Expression;
+import localhost.hyt.lox.Stmt.Print;
 
-public class AstPrinter implements Expr.Visitor<String> {
+public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 
-    String print(Expr exp)
-    {
+    String print(Expr exp) {
         return exp.accept(this);
+    }
+
+    String print(Stmt stmt) {
+        return stmt.accept(this);
     }
 
     @Override
@@ -24,8 +29,7 @@ public class AstPrinter implements Expr.Visitor<String> {
 
     @Override
     public String visitLiteralExpr(Literal expr) {
-        if (expr.value == null)
-        {
+        if (expr.value == null) {
             return "nil";
         }
         return expr.value.toString();
@@ -35,17 +39,27 @@ public class AstPrinter implements Expr.Visitor<String> {
     public String visitUnaryExpr(Unary expr) {
         return parenthesize(expr.operator.lexeme, expr.right);
     }
-    
-    private String parenthesize(String name, Expr ... exprs)
-    {
+
+    private String parenthesize(String name, Expr... exprs) {
         StringBuilder builder = new StringBuilder();
         builder.append("(").append(name);
-        for (Expr exp : exprs)
-        {
+        for (Expr exp : exprs) {
             builder.append(" ");
             builder.append(exp.accept(this));
         }
         builder.append(")");
         return builder.toString();
+    }
+
+    @Override
+    public String visitExpressionStmt(Expression stmt) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visitPrintStmt(Print stmt) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
