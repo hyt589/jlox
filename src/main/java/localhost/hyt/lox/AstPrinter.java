@@ -1,11 +1,15 @@
 package localhost.hyt.lox;
 
+import localhost.hyt.lox.Expr.Assign;
 import localhost.hyt.lox.Expr.Binary;
 import localhost.hyt.lox.Expr.Grouping;
 import localhost.hyt.lox.Expr.Literal;
 import localhost.hyt.lox.Expr.Unary;
+import localhost.hyt.lox.Expr.Variable;
+import localhost.hyt.lox.Stmt.Block;
 import localhost.hyt.lox.Stmt.Expression;
 import localhost.hyt.lox.Stmt.Print;
+import localhost.hyt.lox.Stmt.Var;
 
 public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 
@@ -59,6 +63,30 @@ public class AstPrinter implements Expr.Visitor<String>, Stmt.Visitor<String> {
 
     @Override
     public String visitPrintStmt(Print stmt) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visitVarStmt(Var stmt) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visitVariableExpr(Variable expr) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visitAssignExpr(Assign expr) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visitBlockStmt(Block stmt) {
         // TODO Auto-generated method stub
         return null;
     }

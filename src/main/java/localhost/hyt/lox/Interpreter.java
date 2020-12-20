@@ -2,14 +2,20 @@ package localhost.hyt.lox;
 
 import java.util.List;
 
+import localhost.hyt.lox.Expr.Assign;
 import localhost.hyt.lox.Expr.Binary;
 import localhost.hyt.lox.Expr.Grouping;
 import localhost.hyt.lox.Expr.Literal;
 import localhost.hyt.lox.Expr.Unary;
+import localhost.hyt.lox.Expr.Variable;
+import localhost.hyt.lox.Stmt.Block;
 import localhost.hyt.lox.Stmt.Expression;
 import localhost.hyt.lox.Stmt.Print;
+import localhost.hyt.lox.Stmt.Var;
 
 class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
+
+    private Environment environment = new Environment();
 
     void interpret(Expr expr) {
         try {
@@ -20,11 +26,9 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
     }
 
-    void interpret(List<Stmt> statements)
-    {
+    void interpret(List<Stmt> statements) {
         try {
-            for (Stmt statement : statements)
-            {
+            for (Stmt statement : statements) {
                 execute(statement);
             }
         } catch (RuntimeError e) {
@@ -177,4 +181,45 @@ class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         System.out.println(stringify(value));
         return null;
     }
+
+    @Override
+    public Void visitVarStmt(Var stmt) {
+        Object value = null;
+        if (stmt.initializer != null) {
+            value = evaluate(stmt.initializer);
+        }
+        environment.define(stmt.name.lexeme, value);
+        return null;
+    }
+
+    @Override
+    public Object visitVariableExpr(Variable expr) {
+        return environment.get(expr.name);
+    }
+
+    @Override
+    public Object visitAssignExpr(Assign expr) {
+        Object value = evaluate(expr.value);
+        environment.assign(expr.name, value);
+        return null;
+    }
+
+    @Override
+    public Void visitBlockStmt(Block stmt) {
+        executeBlock(stmt.statements, new Environment(environment));
+        return null;
+    }
+
+    private void executeBlock(List<Stmt> statements, Environment environment) {
+        Environment previous = this.environment;
+        try {
+            this.environment = environment;
+            for (Stmt stmt : statements) {
+                execute(stmt);
+            }
+        } finally {
+            this.environment = previous;
+        }
+    }
+
 }
